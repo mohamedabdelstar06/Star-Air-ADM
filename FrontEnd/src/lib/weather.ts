@@ -16,7 +16,7 @@ export interface AvwxWeatherDetail {
     flightCategory?: 'VFR' | 'MVFR' | 'IFR' | 'LIFR';
 }
 
-const AVWX_TOKEN = 'WLyEyb0JDe3_dtvThr2rZNfF_Gz6S6GWDJPmz0LLh5s';
+const AVWX_TOKEN = import.meta.env.VITE_AVWX_API_KEY || '';
 const HEADERS = { 'Authorization': AVWX_TOKEN };
 
 function categoryColor(cat: 'VFR' | 'MVFR' | 'IFR' | 'LIFR' | undefined): string {
