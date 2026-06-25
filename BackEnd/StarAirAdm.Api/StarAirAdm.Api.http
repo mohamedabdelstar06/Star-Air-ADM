@@ -1,0 +1,6 @@
+@StarAirAdm.Api_HostAddress = http://localhost:5215
+
+GET {{StarAirAdm.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

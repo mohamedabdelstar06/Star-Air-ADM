@@ -1,0 +1,25 @@
+# Node
+node_modules/
+dist/
+build/
+.env
+.env.local
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+appsettings.Development.json
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db
