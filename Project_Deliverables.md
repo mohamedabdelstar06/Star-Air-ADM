@@ -1,4 +1,4 @@
-<![CDATA[# STAR Air ADM — Project Deliverables
+# STAR Air ADM — Project Deliverables
 
 ---
 
@@ -55,4 +55,3 @@ React 18, TypeScript, Vite, Tailwind CSS, Zustand, ASP.NET Core 9, Entity Framew
 - Developed a full-stack aviation SMS platform digitizing 3 pre-flight risk frameworks (IMSAFE, PAVE, DECIDE) across 13 REST endpoints and 15 domain entities
 - Engineered a deterministic risk-scoring engine with FAA-aligned hard overrides and wearable biometric analysis (HR, HRV, SpO₂, stress index)
 - Architected an offline-first PWA with IndexedDB sync queue and custom SVG analytics dashboard serving role-based views for pilots and administrators
-]]>

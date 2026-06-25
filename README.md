@@ -1,4 +1,4 @@
-<![CDATA[<div align="center">
+<div align="center">
 
 # ✈️ STAR Air ADM
 
@@ -368,4 +368,3 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 <div align="center">
 <sub>Built with ❤️ for aviation safety</sub>
 </div>
-]]>
