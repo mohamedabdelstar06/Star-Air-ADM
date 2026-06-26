@@ -1,8 +1,4 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using StarAirAdm.Domain.Entities;
-
-namespace StarAirAdm.Infrastructure.Data.Configurations;
+﻿namespace StarAirAdm.Infrastructure.Data.Configurations;
 
 public class ImSafeAssessmentConfiguration : IEntityTypeConfiguration<ImSafeAssessment>
 {

@@ -1,11 +1,4 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using StarAirAdm.Application.Interfaces;
-using StarAirAdm.Domain.Entities;
-using System.Text.Json;
-
-namespace StarAirAdm.Infrastructure.Data.Interceptors;
+﻿namespace StarAirAdm.Infrastructure.Data.Interceptors;
 
 public class AuditInterceptor : SaveChangesInterceptor
 {

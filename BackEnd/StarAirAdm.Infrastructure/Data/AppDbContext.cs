@@ -1,11 +1,6 @@
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using StarAirAdm.Domain.Entities;
-using System.Reflection;
+﻿namespace StarAirAdm.Infrastructure.Data;
 
-namespace StarAirAdm.Infrastructure.Data;
-
-public class AppDbContext : IdentityDbContext<ApplicationUser>
+public class AppDbContext : IdentityDbContext<ApplicationUser>, IApplicationDbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
@@ -31,7 +26,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
         base.OnModelCreating(builder);
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
-        // SmartWatchReading is the dependent side — FlightTripId is the FK
+        // SmartWatchReading is the dependent side â€” FlightTripId is the FK
         builder.Entity<FlightTrip>()
             .HasOne(f => f.SmartWatchReading)
             .WithOne(s => s.FlightTrip)
