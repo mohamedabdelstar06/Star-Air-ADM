@@ -1,21 +1,15 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using StarAirAdm.Application.Interfaces;
-using System.Security.Claims;
-using System.Threading.Tasks;
-
-namespace StarAirAdm.Api.Controllers;
+﻿namespace StarAirAdm.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
 public class NotificationController : ControllerBase
 {
-    private readonly INotificationService _notificationService;
+    private readonly ISender _sender;
 
-    public NotificationController(INotificationService notificationService)
+    public NotificationController(ISender sender)
     {
-        _notificationService = notificationService;
+        _sender = sender;
     }
 
     [HttpGet]
@@ -24,14 +18,16 @@ public class NotificationController : ControllerBase
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-        var notifications = await _notificationService.GetUserNotificationsAsync(userId);
+        var query = new GetMyNotificationsQuery(userId);
+        var notifications = await _sender.Send(query);
         return Ok(notifications);
     }
 
     [HttpPatch("{id}/read")]
     public async Task<IActionResult> MarkAsRead(int id)
     {
-        await _notificationService.MarkAsReadAsync(id);
+        var command = new MarkNotificationAsReadCommand(id);
+        await _sender.Send(command);
         return Ok();
     }
 
@@ -41,7 +37,8 @@ public class NotificationController : ControllerBase
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-        await _notificationService.MarkAllAsReadAsync(userId);
+        var command = new MarkAllNotificationsAsReadCommand(userId);
+        await _sender.Send(command);
         return Ok();
     }
 }

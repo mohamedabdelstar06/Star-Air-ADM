@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace StarAirAdm.Application.Interfaces;
+﻿namespace StarAirAdm.Application.Interfaces;
 
 public class NotificationDto
 {

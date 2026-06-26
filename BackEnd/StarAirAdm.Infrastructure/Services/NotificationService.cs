@@ -1,12 +1,4 @@
-using Microsoft.EntityFrameworkCore;
-using StarAirAdm.Application.Interfaces;
-using StarAirAdm.Domain.Entities;
-using StarAirAdm.Infrastructure.Data;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace StarAirAdm.Infrastructure.Services;
+﻿namespace StarAirAdm.Infrastructure.Services;
 
 public class NotificationService : INotificationService
 {
