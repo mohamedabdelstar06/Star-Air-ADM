@@ -1,27 +1,21 @@
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using StarAirAdm.Application.DTOs.Dashboard;
-using StarAirAdm.Application.Interfaces;
-using StarAirAdm.Domain.Entities;
-using StarAirAdm.Domain.Enums;
-using StarAirAdm.Infrastructure.Data;
+﻿namespace StarAirAdm.Application.Features.Dashboard.Queries;
 
-namespace StarAirAdm.Infrastructure.Services;
+public record GetDashboardStatsQuery() : IRequest<DashboardStatsDto>;
 
-public class DashboardService : IDashboardService
+public class GetDashboardStatsQueryHandler : IRequestHandler<GetDashboardStatsQuery, DashboardStatsDto>
 {
-    private readonly AppDbContext _db;
+    private readonly IApplicationDbContext _context;
     private readonly UserManager<ApplicationUser> _userManager;
 
-    public DashboardService(AppDbContext db, UserManager<ApplicationUser> userManager)
+    public GetDashboardStatsQueryHandler(IApplicationDbContext context, UserManager<ApplicationUser> userManager)
     {
-        _db = db;
+        _context = context;
         _userManager = userManager;
     }
 
-    public async Task<DashboardStatsDto> GetStatsAsync()
+    public async Task<DashboardStatsDto> Handle(GetDashboardStatsQuery request, CancellationToken cancellationToken)
     {
-        var allUsers = await _userManager.Users.ToListAsync();
+        var allUsers = await _userManager.Users.ToListAsync(cancellationToken);
         var allPilots = new List<ApplicationUser>();
         foreach (var u in allUsers)
         {
@@ -36,27 +30,27 @@ public class DashboardService : IDashboardService
         var totalAircraft = 0;
         var airworthyAircraft = 0;
 
-        var totalImsafe = await _db.ImSafeAssessments.CountAsync();
-        var totalPave = await _db.PaveAssessments.CountAsync();
+        var totalImsafe = await _context.ImSafeAssessments.CountAsync(cancellationToken);
+        var totalPave = await _context.PaveAssessments.CountAsync(cancellationToken);
 
-        var imsafeGo = await _db.ImSafeAssessments.CountAsync(a => a.Result == AssessmentResult.Go);
-        var imSafeCaution = await _db.ImSafeAssessments.CountAsync(a => a.Result == AssessmentResult.Caution);
-        var imsafeNogo = await _db.ImSafeAssessments.CountAsync(a => a.Result == AssessmentResult.NoGo);
+        var imsafeGo = await _context.ImSafeAssessments.CountAsync(a => a.Result == AssessmentResult.Go, cancellationToken);
+        var imSafeCaution = await _context.ImSafeAssessments.CountAsync(a => a.Result == AssessmentResult.Caution, cancellationToken);
+        var imsafeNogo = await _context.ImSafeAssessments.CountAsync(a => a.Result == AssessmentResult.NoGo, cancellationToken);
 
-        var paveGo = await _db.PaveAssessments.CountAsync(a => a.Result == AssessmentResult.Go);
-        var paveCaution = await _db.PaveAssessments.CountAsync(a => a.Result == AssessmentResult.Caution);
-        var paveNogo = await _db.PaveAssessments.CountAsync(a => a.Result == AssessmentResult.NoGo);
+        var paveGo = await _context.PaveAssessments.CountAsync(a => a.Result == AssessmentResult.Go, cancellationToken);
+        var paveCaution = await _context.PaveAssessments.CountAsync(a => a.Result == AssessmentResult.Caution, cancellationToken);
+        var paveNogo = await _context.PaveAssessments.CountAsync(a => a.Result == AssessmentResult.NoGo, cancellationToken);
 
         // Recent 10 assessments across both types
-        var recentImsafe = await _db.ImSafeAssessments
+        var recentImsafe = await _context.ImSafeAssessments
             .Include(a => a.Pilot)
             .OrderByDescending(a => a.AssessedAt)
-            .Take(5).AsNoTracking().ToListAsync();
+            .Take(5).AsNoTracking().ToListAsync(cancellationToken);
 
-        var recentPave = await _db.PaveAssessments
+        var recentPave = await _context.PaveAssessments
             .Include(a => a.Pilot)
             .OrderByDescending(a => a.AssessedAt)
-            .Take(5).AsNoTracking().ToListAsync();
+            .Take(5).AsNoTracking().ToListAsync(cancellationToken);
 
         var recentAssessments = recentImsafe
             .Select(a => new RecentAssessmentDto

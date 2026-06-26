@@ -1,23 +1,22 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using StarAirAdm.Application.Interfaces;
-
-namespace StarAirAdm.Api.Controllers;
+﻿namespace StarAirAdm.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize(Roles = "Admin")]
 public class DashboardController : ControllerBase
 {
-    private readonly IDashboardService _svc;
-    public DashboardController(IDashboardService svc) => _svc = svc;
+    private readonly ISender _sender;
+    
+    public DashboardController(ISender sender) => _sender = sender;
 
     [HttpGet]
     public async Task<IActionResult> GetStats()
     {
         try
         {
-            return Ok(await _svc.GetStatsAsync());
+            var query = new GetDashboardStatsQuery();
+            var stats = await _sender.Send(query);
+            return Ok(stats);
         }
         catch (Exception ex)
         {
