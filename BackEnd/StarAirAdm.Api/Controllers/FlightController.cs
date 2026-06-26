@@ -1,21 +1,15 @@
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using StarAirAdm.Application.DTOs.Flights;
-using StarAirAdm.Application.Interfaces;
-
-namespace StarAirAdm.Api.Controllers;
+﻿namespace StarAirAdm.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
 public class FlightController : ControllerBase
 {
-    private readonly IFlightService _flightService;
+    private readonly ISender _sender;
 
-    public FlightController(IFlightService flightService)
+    public FlightController(ISender sender)
     {
-        _flightService = flightService;
+        _sender = sender;
     }
 
     [HttpPost]
@@ -24,10 +18,11 @@ public class FlightController : ControllerBase
     {
         try
         {
-            var result = await _flightService.CreateFlightAsync(dto);
+            var command = new CreateFlightCommand(dto);
+            var result = await _sender.Send(command);
             return Ok(result);
         }
-        catch (Exception ex)
+        catch (System.Exception ex)
         {
             return BadRequest(new { message = ex.Message });
         }
@@ -39,11 +34,12 @@ public class FlightController : ControllerBase
     {
         try
         {
-            var result = await _flightService.UpdateFlightAsync(id, dto);
+            var command = new UpdateFlightCommand(id, dto);
+            var result = await _sender.Send(command);
             if (result == null) return NotFound(new { message = "Flight not found." });
             return Ok(result);
         }
-        catch (Exception ex)
+        catch (System.Exception ex)
         {
             return BadRequest(new { message = ex.Message });
         }
@@ -55,7 +51,8 @@ public class FlightController : ControllerBase
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-        var result = await _flightService.GetMyFlightsAsync(userId);
+        var query = new GetMyFlightsQuery(userId);
+        var result = await _sender.Send(query);
         return Ok(result);
     }
 
@@ -63,14 +60,16 @@ public class FlightController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetAll()
     {
-        var result = await _flightService.GetAllFlightsAsync();
+        var query = new GetAllFlightsQuery();
+        var result = await _sender.Send(query);
         return Ok(result);
     }
 
     [HttpPatch("{id}/link")]
     public async Task<IActionResult> LinkAssessments(int id, LinkAssessmentDto dto)
     {
-        var result = await _flightService.LinkAssessmentsAsync(id, dto);
+        var command = new LinkAssessmentsCommand(id, dto);
+        var result = await _sender.Send(command);
         if (result == null) return NotFound();
         return Ok(result);
     }
@@ -78,7 +77,8 @@ public class FlightController : ControllerBase
     [HttpPatch("{id}/complete")]
     public async Task<IActionResult> Complete(int id)
     {
-        var result = await _flightService.CompleteFlightAsync(id);
+        var command = new CompleteFlightCommand(id);
+        var result = await _sender.Send(command);
         if (result == null) return NotFound();
         return Ok(result);
     }
@@ -87,7 +87,8 @@ public class FlightController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int id)
     {
-        var result = await _flightService.DeleteFlightAsync(id);
+        var command = new DeleteFlightCommand(id);
+        var result = await _sender.Send(command);
         if (!result) return NotFound();
         return NoContent();
     }
