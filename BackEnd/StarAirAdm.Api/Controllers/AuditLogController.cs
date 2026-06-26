@@ -1,25 +1,22 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using StarAirAdm.Application.Interfaces;
-
-namespace StarAirAdm.Api.Controllers;
+﻿namespace StarAirAdm.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
 [Authorize(Roles = "Admin")]
 public class AuditLogController : ControllerBase
 {
-    private readonly IAuditLogService _auditLogService;
+    private readonly ISender _sender;
 
-    public AuditLogController(IAuditLogService auditLogService)
+    public AuditLogController(ISender sender)
     {
-        _auditLogService = auditLogService;
+        _sender = sender;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAllLogs()
     {
-        var logs = await _auditLogService.GetAllLogsAsync();
+        var query = new GetAllAuditLogsQuery();
+        var logs = await _sender.Send(query);
         return Ok(logs);
     }
 }
