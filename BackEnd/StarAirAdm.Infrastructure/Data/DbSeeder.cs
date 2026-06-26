@@ -1,10 +1,4 @@
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using StarAirAdm.Domain.Entities;
-using StarAirAdm.Domain.Enums;
-
-namespace StarAirAdm.Infrastructure.Data;
+﻿namespace StarAirAdm.Infrastructure.Data;
 
 public static class DbSeeder
 {

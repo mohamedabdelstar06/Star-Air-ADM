@@ -1,7 +1,4 @@
-using System.Net;
-using System.Text.Json;
-
-namespace StarAirAdm.Api.Middlewares;
+﻿namespace StarAirAdm.Api.Middlewares;
 
 public class GlobalExceptionMiddleware
 {

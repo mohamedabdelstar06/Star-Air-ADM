@@ -1,11 +1,4 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using StarAirAdm.Infrastructure;
-using StarAirAdm.Api.Middlewares;
-using System.Text;
-
-var builder = WebApplication.CreateBuilder(args);
+﻿var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -44,7 +37,8 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<StarAirAdm.Application.Interfaces.ICurrentUserService, StarAirAdm.Api.Services.CurrentUserService>();
-
+// Application
+builder.Services.AddApplication();
 // Infrastructure
 builder.Services.AddInfrastructure(builder.Configuration);
 
@@ -110,6 +104,9 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
+        var context = services.GetRequiredService<StarAirAdm.Infrastructure.Data.AppDbContext>();
+        await Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.MigrateAsync(context.Database);
+        
         await StarAirAdm.Infrastructure.Data.DbSeeder.SeedRolesAndAdminAsync(services);
     }
     catch (Exception ex)
