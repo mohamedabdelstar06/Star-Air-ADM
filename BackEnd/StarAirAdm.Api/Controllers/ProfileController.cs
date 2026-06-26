@@ -1,22 +1,16 @@
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using StarAirAdm.Application.DTOs.Users;
-using StarAirAdm.Application.Interfaces;
-
-namespace StarAirAdm.Api.Controllers;
+﻿namespace StarAirAdm.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize] // Any authenticated user can access their own profile
 public class ProfileController : ControllerBase
 {
-    private readonly IUserService _userService;
+    private readonly ISender _sender;
     private readonly IWebHostEnvironment _env;
 
-    public ProfileController(IUserService userService, IWebHostEnvironment env)
+    public ProfileController(ISender sender, IWebHostEnvironment env)
     {
-        _userService = userService;
+        _sender = sender;
         _env = env;
     }
 
@@ -26,7 +20,8 @@ public class ProfileController : ControllerBase
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-        var user = await _userService.GetUserByIdAsync(userId);
+        var query = new GetMeQuery(userId);
+        var user = await _sender.Send(query);
         if (user == null) return NotFound(new { message = "User profile not found" });
 
         return Ok(user);
@@ -38,7 +33,8 @@ public class ProfileController : ControllerBase
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-        var user = await _userService.UpdateUserAsync(userId, request);
+        var command = new UpdateMeCommand(userId, request);
+        var user = await _sender.Send(command);
         if (user == null) return NotFound(new { message = "User profile not found or update failed" });
 
         return Ok(user);
@@ -71,11 +67,11 @@ public class ProfileController : ControllerBase
 
         var fileUrl = $"/uploads/profiles/{uniqueFileName}";
 
-        // Update User ProfileImageUrl field
-        var existingUser = await _userService.GetUserByIdAsync(userId);
+        // Update User ProfileImageUrl using the existing get/update workflow via MediatR
+        var query = new GetMeQuery(userId);
+        var existingUser = await _sender.Send(query);
         if (existingUser == null) return NotFound(new { message = "User not found" });
 
-        // Update the image using UpdateUserAsync
         var updateDto = new UpdateUserDto
         {
             FullName = existingUser.FullName,
@@ -86,7 +82,8 @@ public class ProfileController : ControllerBase
             ProfileImageUrl = fileUrl
         };
 
-        var updatedUser = await _userService.UpdateUserAsync(userId, updateDto);
+        var command = new UpdateMeCommand(userId, updateDto);
+        var updatedUser = await _sender.Send(command);
         return Ok(updatedUser);
     }
 }

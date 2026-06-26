@@ -1,8 +1,4 @@
-using Microsoft.AspNetCore.Http;
-using System.Security.Claims;
-using StarAirAdm.Application.Interfaces;
-
-namespace StarAirAdm.Api.Services;
+﻿namespace StarAirAdm.Api.Services;
 
 public class CurrentUserService : ICurrentUserService
 {
