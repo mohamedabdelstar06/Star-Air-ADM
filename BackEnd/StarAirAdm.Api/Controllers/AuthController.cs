@@ -1,19 +1,15 @@
-using Microsoft.AspNetCore.Mvc;
-using StarAirAdm.Application.DTOs.Auth;
-using StarAirAdm.Application.Interfaces;
-
-namespace StarAirAdm.Api.Controllers;
+﻿namespace StarAirAdm.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly IAuthService _authService;
+    private readonly ISender _sender;
     private readonly ILogger<AuthController> _logger;
 
-    public AuthController(IAuthService authService, ILogger<AuthController> logger)
+    public AuthController(ISender sender, ILogger<AuthController> logger)
     {
-        _authService = authService;
+        _sender = sender;
         _logger = logger;
     }
 
@@ -28,7 +24,9 @@ public class AuthController : ControllerBase
             return BadRequest(new { message = "Email payload is missing." });
         }
 
-        var response = await _authService.CheckEmailStatusAsync(request);
+        var query = new CheckEmailQuery(request.Email);
+        var response = await _sender.Send(query);
+        
         if (!response.Exists)
         {
             _logger.LogWarning("404 Not Found: Email {Email} does not currently exist in the database.", request.Email);
@@ -50,7 +48,9 @@ public class AuthController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var response = await _authService.LoginAsync(request);
+        var command = new LoginCommand(request.Email, request.Password);
+        var response = await _sender.Send(command);
+        
         if (response == null)
         {
             _logger.LogWarning("401 Unauthorized: Login failed for {Email}. Invalid email or correct password mismatch.", request.Email);
@@ -66,7 +66,9 @@ public class AuthController : ControllerBase
     {
         _logger.LogInformation("Processing refresh token request.");
 
-        var response = await _authService.RefreshTokenAsync(request);
+        var command = new RefreshTokenCommand(request.AccessToken, request.RefreshToken);
+        var response = await _sender.Send(command);
+        
         if (response == null)
         {
             _logger.LogWarning("401 Unauthorized: Failed to refresh token. Either the refresh token is expired, mismatched, or the user is invalid.");
@@ -88,7 +90,9 @@ public class AuthController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var result = await _authService.SetPasswordAsync(request);
+        var command = new SetPasswordCommand(request.Email, request.InvitationToken, request.NewPassword);
+        var result = await _sender.Send(command);
+        
         if (!result)
         {
             _logger.LogWarning("400 Bad Request: Set-Password failed for {Email}. Invitation token may be invalid, missing, or expired.", request.Email);
@@ -104,7 +108,9 @@ public class AuthController : ControllerBase
     {
         _logger.LogInformation("Processing forgot-password request for {Email}", request.Email);
 
-        var result = await _authService.ForgotPasswordAsync(request.Email);
+        var command = new ForgotPasswordCommand(request.Email);
+        var result = await _sender.Send(command);
+        
         if (!result)
         {
             _logger.LogWarning("Forgot Password notice: User {Email} does not exist, or is inactive. Responding with 200 OK regardless to prevent enumeration.", request.Email);
@@ -119,7 +125,9 @@ public class AuthController : ControllerBase
     {
         _logger.LogInformation("Processing reset-password request for {Email}", request.Email);
 
-        var result = await _authService.ResetPasswordAsync(request);
+        var command = new ResetPasswordCommand(request.Email, request.Token, request.NewPassword);
+        var result = await _sender.Send(command);
+        
         if (!result)
         {
             _logger.LogWarning("400 Bad Request: Reset-Password failed for {Email}. Invalid reset token, or email mismatch.", request.Email);
