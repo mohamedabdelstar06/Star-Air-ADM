@@ -1,12 +1,4 @@
-using StarAirAdm.Application.DTOs.Checklist;
-using StarAirAdm.Application.DTOs.Dashboard;
-using StarAirAdm.Application.DTOs.Decide;
-using StarAirAdm.Application.DTOs.ImSafe;
-using StarAirAdm.Application.DTOs.Kneeboard;
-using StarAirAdm.Application.DTOs.Pave;
-using StarAirAdm.Application.DTOs.SmartWatch;
-
-namespace StarAirAdm.Application.Interfaces;
+﻿namespace StarAirAdm.Application.Interfaces;
 
 public interface IImSafeService
 {

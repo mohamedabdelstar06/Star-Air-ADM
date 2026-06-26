@@ -1,12 +1,4 @@
-using MailKit.Net.Smtp;
-using MailKit.Security;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using MimeKit;
-using StarAirAdm.Application.Interfaces;
-using StarAirAdm.Application.Models;
-
-namespace StarAirAdm.Infrastructure.Services;
+﻿namespace StarAirAdm.Infrastructure.Services;
 
 public class EmailService : IEmailService
 {

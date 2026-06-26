@@ -1,14 +1,4 @@
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
-using StarAirAdm.Infrastructure.Data;
-using Microsoft.AspNetCore.Identity;
-using StarAirAdm.Domain.Entities;
-using StarAirAdm.Application.Interfaces;
-using StarAirAdm.Infrastructure.Services;
-using StarAirAdm.Application.Models;
-
-namespace StarAirAdm.Infrastructure;
+﻿namespace StarAirAdm.Infrastructure;
 
 public static class DependencyInjection
 {
@@ -36,19 +26,10 @@ public static class DependencyInjection
         services.Configure<EmailSettings>(configuration.GetSection("Email"));
         
         services.AddScoped<IEmailService, EmailService>();
-        services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IJwtService, JwtService>();
+        services.AddScoped<StarAirAdm.Application.Common.Interfaces.IApplicationDbContext>(provider => provider.GetRequiredService<AppDbContext>());
 
         // Phase 2 services
-        services.AddScoped<IImSafeService, ImSafeService>();
-        services.AddScoped<IPaveService, PaveService>();
-        services.AddScoped<IDecideService, DecideService>();
-        services.AddScoped<ISmartWatchService, SmartWatchService>();
-        services.AddScoped<IKneeboardService, KneeboardService>();
-        services.AddScoped<IChecklistService, ChecklistService>();
-        services.AddScoped<IDashboardService, DashboardService>();
-        services.AddScoped<IAuditLogService, AuditLogService>();
-        services.AddScoped<IFlightService, FlightService>();
         services.AddScoped<INotificationService, NotificationService>();
 
 
