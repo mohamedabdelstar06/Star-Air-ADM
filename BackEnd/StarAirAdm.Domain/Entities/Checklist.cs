@@ -1,6 +1,4 @@
-using StarAirAdm.Domain.Common;
-
-namespace StarAirAdm.Domain.Entities;
+﻿namespace StarAirAdm.Domain.Entities;
 
 public class Checklist : BaseEntity
 {

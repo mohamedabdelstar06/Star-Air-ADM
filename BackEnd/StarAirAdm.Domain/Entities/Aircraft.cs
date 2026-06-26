@@ -1,7 +1,4 @@
-using StarAirAdm.Domain.Common;
-using StarAirAdm.Domain.Enums;
-
-namespace StarAirAdm.Domain.Entities;
+﻿namespace StarAirAdm.Domain.Entities;
 
 public class Aircraft : BaseEntity
 {

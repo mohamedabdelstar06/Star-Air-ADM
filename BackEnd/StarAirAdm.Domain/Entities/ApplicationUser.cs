@@ -1,7 +1,4 @@
-using Microsoft.AspNetCore.Identity;
-using StarAirAdm.Domain.Enums;
-
-namespace StarAirAdm.Domain.Entities;
+﻿namespace StarAirAdm.Domain.Entities;
 
 public class ApplicationUser : IdentityUser
 {
