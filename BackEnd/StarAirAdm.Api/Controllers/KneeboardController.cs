@@ -1,24 +1,20 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using StarAirAdm.Application.DTOs.Kneeboard;
-using StarAirAdm.Application.Interfaces;
-using System.Security.Claims;
-
-namespace StarAirAdm.Api.Controllers;
+﻿namespace StarAirAdm.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize(Roles = "Pilot")]
 public class KneeboardController : ControllerBase
 {
-    private readonly IKneeboardService _svc;
-    public KneeboardController(IKneeboardService svc) => _svc = svc;
+    private readonly ISender _sender;
+    
+    public KneeboardController(ISender sender) => _sender = sender;
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateKneeboardNoteDto dto)
     {
         var pilotId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var result = await _svc.CreateAsync(dto, pilotId);
+        var command = new CreateKneeboardNoteCommand(dto, pilotId);
+        var result = await _sender.Send(command);
         return result == null ? BadRequest() : Ok(result);
     }
 
@@ -26,14 +22,16 @@ public class KneeboardController : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         var pilotId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        return Ok(await _svc.GetByPilotAsync(pilotId));
+        var query = new GetMyKneeboardNotesQuery(pilotId);
+        return Ok(await _sender.Send(query));
     }
 
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, [FromBody] CreateKneeboardNoteDto dto)
     {
         var pilotId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var result = await _svc.UpdateAsync(id, dto, pilotId);
+        var command = new UpdateKneeboardNoteCommand(id, dto, pilotId);
+        var result = await _sender.Send(command);
         return result == null ? NotFound() : Ok(result);
     }
 
@@ -41,7 +39,8 @@ public class KneeboardController : ControllerBase
     public async Task<IActionResult> Delete(int id)
     {
         var pilotId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var ok = await _svc.DeleteAsync(id, pilotId);
+        var command = new DeleteKneeboardNoteCommand(id, pilotId);
+        var ok = await _sender.Send(command);
         return ok ? NoContent() : NotFound();
     }
 }
